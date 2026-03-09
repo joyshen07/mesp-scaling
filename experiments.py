@@ -136,16 +136,7 @@ for j, s in enumerate(s_range):
     print(' & '.join(line) + ' \\\\')
 print('\\bottomrule')
 
-# plot the figure for optimality gap
-for i in range(len(algos)):
-    gap_list = [- opt[s] - stats["lb"][j][i] for j, s in enumerate(s_range)]
-    plt.plot(s_range, gap_list, marker='o')
-plt.ylim(bottom=0)
-plt.legend(algo_names, loc='upper right')
-plt.title(f'gap, d = {d}')
-plt.show()
-
-# save the tables & figure
+# save the tables
 Constant.path_output = 'output'
 timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
 foldername = timestamp + f'-d{d}'
@@ -154,23 +145,30 @@ for key in ['lb', 'gap', 'time', 'iter']:
     table = np.hstack((np.array([s_range]).T, stats[key]))
     np.savetxt(os.path.join(Constant.path_output, foldername, key + '.csv'), table, delimiter=',',
                header=','.join(['s'] + algo_names))
-plt.savefig(os.path.join(Constant.path_output, foldername, 'gap.pdf'), bbox_inches="tight")
 
+# plot optimality gap
 plt.style.use({'font.family': 'Arial', 'font.size': 20})
 plt.figure(figsize=(8, 6))
-# plot the figure for optimality gap
 for i in range(len(algos)):
-    # gap_list = [- opt[s] - stats["lb"][j][i] for j, s in enumerate(s_range)]
-    # gap_list = [stats["lb"][j][i] for j, s in enumerate(s_range)]
+    gap_list = [- opt[s] - stats["lb"][j][i] for j, s in enumerate(s_range)]
+    plt.plot(s_range, gap_list, marker='o')
+plt.ylim(bottom=0)
+# plt.legend(algo_names, loc='upper right')
+plt.ylabel(f'integrality gap', fontsize=25)
+plt.xlabel(f'subset size', fontsize=25)
+plt.tight_layout()  # Prevent label cutoff
+plt.savefig(os.path.join(Constant.path_output, foldername, 'gap.pdf'), bbox_inches="tight")
+plt.show()
+
+# plot solution time
+plt.figure(figsize=(8, 6))
+for i in range(len(algos)):
     gap_list = [stats["time"][j][i] for j, s in enumerate(s_range)]
     plt.plot(s_range, gap_list, marker='o')
 plt.ylim(bottom=0)
-# plt.legend(algo_names)  # , loc='center left', bbox_to_anchor=(1, 0.5))
-# plt.title(f'd = {d}')  # f'gap, d = {d}')
-# plt.ylabel(f'integrality gap', fontsize=25)
-# plt.ylabel(f'relaxation bound', fontsize=25)
+plt.legend(algo_names)  # , loc='center left', bbox_to_anchor=(1, 0.5))
 plt.ylabel(f'time', fontsize=25)
 plt.xlabel(f'subset size', fontsize=25)
 plt.tight_layout()  # Prevent label cutoff
+plt.savefig(os.path.join(Constant.path_output, foldername, 'time.pdf'), bbox_inches="tight")
 plt.show()
-plt.savefig('time.pdf', bbox_inches="tight")

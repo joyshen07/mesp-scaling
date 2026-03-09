@@ -63,7 +63,7 @@ plt.legend(algo_names, loc='center left', bbox_to_anchor=(1, 0.5))
 plt.ylabel(f'time', fontsize=25)
 plt.xlabel(f'subset size', fontsize=25)
 plt.tight_layout()  # Prevent label cutoff
-plt.show()
 
 # save figure to file
-plt.savefig('gap.pdf', bbox_inches="tight")
+plt.savefig('output/time.pdf', bbox_inches="tight")
+plt.show()
