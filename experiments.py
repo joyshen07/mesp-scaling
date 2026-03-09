@@ -1,5 +1,5 @@
-from scaling_linx_bt import *
-from scaling_gamma import *
+from linx import *
+from gamma import *
 
 from datetime import datetime
 
