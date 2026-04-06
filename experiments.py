@@ -157,7 +157,7 @@ plt.ylim(bottom=0)
 plt.ylabel(f'integrality gap', fontsize=25)
 plt.xlabel(f'subset size', fontsize=25)
 plt.tight_layout()  # Prevent label cutoff
-plt.savefig(os.path.join(Constant.path_output, foldername, 'gap.pdf'), bbox_inches="tight")
+plt.savefig(os.path.join(Constant.path_output, foldername, f'gap-d{d}.pdf'), bbox_inches="tight")
 plt.show()
 
 # plot solution time
@@ -170,5 +170,5 @@ plt.legend(algo_names)  # , loc='center left', bbox_to_anchor=(1, 0.5))
 plt.ylabel(f'time', fontsize=25)
 plt.xlabel(f'subset size', fontsize=25)
 plt.tight_layout()  # Prevent label cutoff
-plt.savefig(os.path.join(Constant.path_output, foldername, 'time.pdf'), bbox_inches="tight")
+plt.savefig(os.path.join(Constant.path_output, foldername, f'time-d{d}.pdf'), bbox_inches="tight")
 plt.show()

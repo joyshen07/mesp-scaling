@@ -10,9 +10,9 @@ from constants import get_algo_names, get_s_range, get_opt
 stats = {}
 
 # specify filename of saved output
-Constant.path_output = 'output_SC'
-# foldername = '20251026-113944-d90'
-foldername = '20251026-113339-d124'
+Constant.path_output = 'output'
+foldername = '20260406-014317-d90'
+# foldername = '20260406-014652-d124'
 
 # retrieve config of saved run
 d = int(foldername.split('-d')[-1])
@@ -26,7 +26,7 @@ algos = linx_algos + gamma_algos
 algo_names = get_algo_names(algos)
 
 # retrieve data from saved table
-for key in ['time', 'gap', 'lb']:
+for key in ['time', 'gap', 'lb', 'iter']:
     stats[key] = np.genfromtxt(os.path.join(Constant.path_output, foldername, key + '.csv'), delimiter=',')[:, 1:]
 
 # display the results as a formatted table
@@ -44,26 +44,34 @@ for j, s in enumerate(s_range):
         line += [f'{stats["lb"][j][i]:8.3f}',
                  f'{-opt[s] - stats["lb"][j][i] :.3f}',
                  f'{stats["gap"][j][i]:.4f}',
-                 f'{stats["time"][j][i]:5.2f}']
+                 f'{stats["time"][j][i]:5.2f}',
+                 f'{int(stats["iter"][j][i]):4d}']
     print(' & '.join(line) + ' \\\\')
 print('\\bottomrule')
 
-# convergence plot
+# plot optimality gap
 plt.style.use({'font.family': 'Arial', 'font.size': 20})
-plt.figure(figsize=(11, 6))
-# plot the figure for optimality gap
+plt.figure(figsize=(8, 6))
 for i in range(len(algos)):
-    # gap_list = [- opt[s] - stats["lb"][j][i] for j, s in enumerate(s_range)]
+    gap_list = [- opt[s] - stats["lb"][j][i] for j, s in enumerate(s_range)]
+    plt.plot(s_range, gap_list, marker='o')
+plt.ylim(bottom=0)
+# plt.legend(algo_names)
+plt.ylabel(f'integrality gap', fontsize=25)
+plt.xlabel(f'subset size', fontsize=25)
+plt.tight_layout()  # Prevent label cutoff
+plt.savefig(os.path.join(Constant.path_output, foldername, f'gap-d{d}.pdf'), bbox_inches="tight")
+plt.show()
+
+# plot solution time
+plt.figure(figsize=(11, 6))
+for i in range(len(algos)):
     gap_list = [stats["time"][j][i] for j, s in enumerate(s_range)]
     plt.plot(s_range, gap_list, marker='o')
 plt.ylim(bottom=0)
 plt.legend(algo_names, loc='center left', bbox_to_anchor=(1, 0.5))
-# plt.title(f'd = {d}')  # f'gap, d = {d}')
-# plt.ylabel(f'integrality gap', fontsize=25)
 plt.ylabel(f'time', fontsize=25)
 plt.xlabel(f'subset size', fontsize=25)
 plt.tight_layout()  # Prevent label cutoff
-
-# save figure to file
-plt.savefig('output/time.pdf', bbox_inches="tight")
+plt.savefig(os.path.join(Constant.path_output, foldername, f'time-d{d}.pdf'), bbox_inches="tight")
 plt.show()
