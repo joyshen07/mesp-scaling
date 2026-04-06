@@ -13,6 +13,7 @@ class OScaledLinxExtragradient(MESProblemAlgorithm):
         self.eps = 1e-10  # tolerance to prevent division by 0
         self.grad_xi = None  # a measurement of convergence / saddle point gap
         self.stop = False  # whether stopping criterion is satisfied
+        self.theta = .9  # multiplier for backtracking
 
     def initialize(self, initial_pt=None):
         super().initialize(initial_pt)
@@ -52,23 +53,25 @@ class OScaledLinxExtragradient(MESProblemAlgorithm):
         # see definition from [Fampa and Lee, 2022] (page 54)
         return np.exp(lg) * (self.data.C @ np.diag(x) @ self.data.C) + np.diag(1 - x)
 
+    def stepsize_init(self):
+        if self.i_iter == 0:
+            return
+        mult = 1 + 1 / np.log(self.i_iter + 1)
+        # Update initial stepsize for next iteration
+        self.stepsize = min(self.stepsize * mult, self.theta / self.L)
+
     def stepsize_update(self):
         # inherited by other scaling relaxations
-        theta = .5
-        kappa = .75
-        if self.i_iter >= 100:
-            # self.stepsize = min(self.stepsize, theta / self.L)
-            self.stepsize *= kappa
-        elif self.i_iter >= 0:
-            # initial phase: not enforcing monotonicity
-            self.stepsize = theta / self.L
+        self.stepsize *= self.theta
 
     def update(self):
 
-        first_round = True  # enter the loop at least once
-        while first_round or self.L * self.stepsize >= 1:
+        self.stepsize_init()
 
-            if not first_round or self.i_iter < 100:
+        first_round = True  # enter the loop at least once
+        while first_round or self.L * self.stepsize >= .99:
+
+            if not first_round:
                 # update stepsize
                 self.stepsize_update()
             else:
@@ -102,9 +105,6 @@ class OScaledLinxExtragradient(MESProblemAlgorithm):
             self.L = max(np.linalg.norm(grad_z_tmp - grad_z) / np.linalg.norm(z_tmp - z),
                          np.linalg.norm(grad_z_tmp - grad_z_new) / np.linalg.norm(z_tmp - z_new)
                          if np.linalg.norm(z_tmp - z_new) >= self.eps else 0)
-            # no backtracking during initial stage
-            if self.i_iter < 100:
-                break
 
         # stopping criterion: gradient norm
         xi = - (z_new - z) / self.stepsize - grad_z_tmp
@@ -178,10 +178,12 @@ class GScaledLinxExtragradient(OScaledLinxExtragradient):
 
     def update(self):
 
-        first_round = True  # enter the loop at least once
-        while first_round or self.L * self.stepsize >= 1:
+        self.stepsize_init()
 
-            if not first_round or self.i_iter < 100:
+        first_round = True  # enter the loop at least once
+        while first_round or self.L * self.stepsize >= .99:
+
+            if not first_round:
                 # update stepsize
                 self.stepsize_update()
             else:
@@ -214,9 +216,6 @@ class GScaledLinxExtragradient(OScaledLinxExtragradient):
             self.L = max(np.linalg.norm(grad_z_tmp - grad_z) / np.linalg.norm(z_tmp - z),
                          np.linalg.norm(grad_z_tmp - grad_z_new) / np.linalg.norm(z_tmp - z_new)
                          if np.linalg.norm(z_tmp - z_new) >= self.eps else 0)
-            # no backtracking during initial stage
-            if self.i_iter < 100:
-                break
 
         # stopping criterion: gradient norm
         xi = - (z_new - z) / self.stepsize - grad_z_tmp
@@ -289,10 +288,12 @@ class GGScaledLinxExtragradient(OScaledLinxExtragradient):
 
     def update(self):
 
-        first_round = True  # enter the loop at least once
-        while first_round or self.L * self.stepsize >= 1:
+        self.stepsize_init()
 
-            if not first_round or self.i_iter < 100:
+        first_round = True  # enter the loop at least once
+        while first_round or self.L * self.stepsize >= .99:
+
+            if not first_round:
                 # update stepsize
                 self.stepsize_update()
             else:
@@ -325,9 +326,6 @@ class GGScaledLinxExtragradient(OScaledLinxExtragradient):
             self.L = max(np.linalg.norm(grad_z_tmp - grad_z) / np.linalg.norm(z_tmp - z),
                          np.linalg.norm(grad_z_tmp - grad_z_new) / np.linalg.norm(z_tmp - z_new)
                          if np.linalg.norm(z_tmp - z_new) >= self.eps else 0)
-            # no backtracking during initial stage
-            if self.i_iter < 100:
-                break
 
         # stopping criterion: gradient norm
         xi = - (z_new - z) / self.stepsize - grad_z_tmp
