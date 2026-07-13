@@ -56,16 +56,6 @@ class MESProblemInstance:
         # C = np.array(C)
         # C = C.reshape(d, d)
         return cls(C, s)
-
-    # @classmethod
-    # def read_data_d124(cls, s):
-    #     # read data from file
-    #     d = 124
-    #     C = pd.read_table(os.getcwd() + '/Data124.dms',
-    #                       header=None, encoding='utf-8', sep='\s+')
-    #     C = np.array(C)
-    #     C = C.reshape(d, d)
-    #     return cls(C, s)
         
     @classmethod
     def generate_data(cls, d, s, seed):

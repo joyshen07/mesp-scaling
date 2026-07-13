@@ -12,12 +12,7 @@ import matplotlib.pyplot as plt
 
 # experiment setup
 d = 124
-# # s = 50
-# s_range = [s for s in range(20, 110, 10)]
 # d = 90
-# s_range = [s for s in range(20, 90, 10)]
-# d = 2000
-# s_range = [100, 200, 300, 500, 700, 900, 1000]
 s_range = get_s_range(d)
 opt = get_opt(d)
 
